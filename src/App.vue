@@ -11,6 +11,7 @@
         height: 100vh;
         /*最小宽度*/
         min-width: 1425px;
+        overflow-y: hidden;
     }
     #nprogress .bar {
     /*    自定义进度条颜色*/

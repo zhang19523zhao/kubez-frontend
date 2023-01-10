@@ -60,9 +60,9 @@
 <!--              mode="inline" 纵向-->
 <!--              routerChange()处理跳转和点击-->
               <a-menu
-                  :selectedKeys="selectedKeys2"
+                  v-model:selectedKeys="selectedKeys2"
                   :openKeys="openKeys"
-                  :openChange="openChange"
+                  @openChange="openChange"
                   mode="inline"
                   :style="{ height: '100%', borderRight: 0}">
 <!--            routers是router/index.js的路由信息-->
@@ -109,7 +109,14 @@
                 </template>
               </a-menu>
               </a-layout-sider>
-              <a-layout style="padding: 0 24px" >
+              <a-layout style="padding: 0 24px;color: gold" >
+<!--                面包屑-->
+                <a-breadcrumb style="margin: 10px 0">
+                      <a-breadcrumb-item>工作台</a-breadcrumb-item>
+                      <template v-for="match, index in router.currentRoute.value.matched" :key="index">
+                            <a-breadcrumb-item > {{match.name}}</a-breadcrumb-item>
+                      </template>
+                </a-breadcrumb>
 <!--                main的部分-->
                 <a-layout-content
                     :style="{
@@ -156,11 +163,7 @@ export default ({
     const openKeys = ref([])
     // 通过useRouter方法获取路由配置以及当前页面的路由信息
     const router = useRouter()
-    //
-    onMounted(() => {
-      routers.value = router.options.routes
-      console.log(routers.value)
-    })
+
 
     // 判断点击是否为sub下面的栏目（也就是单独item）如果不是，则关闭其他父栏目
     function routerChange(type,path){
@@ -178,10 +181,26 @@ export default ({
     //专门用于sub的打开
    function openChange(val){
         //匹配这个val（path）是否已经打开，如果没有，则打开他，关闭他
-        const latestOpenKey = val.find(key => openKeys.value.indexOf(key) == -1)
-        openKeys.value = latestOpenKey? [latestOpenKey]:[]
+        // const latestOpenKey = val.find(key => openKeys.value.indexOf(key) == -1)
+        // openKeys.value = latestOpenKey? [latestOpenKey]:[]
+
+         const latestOpenKey = val.find(key => openKeys.value.indexOf(key) === -1);
+         openKeys.value = latestOpenKey ? [latestOpenKey] : [];
     }
 
+    function getRouter(val){
+      selectedKeys2.value = [val[1].path]
+      openKeys.value = [val[0].path]
+      console.log(selectedKeys2.value)
+      console.log(openKeys.value)
+    }
+
+    // 生命周期钩子
+    onMounted(() => {
+      routers.value = router.options.routes
+      getRouter(router.currentRoute.value.matched)
+      console.log(router.currentRoute.value.matched)
+    })
     return {
       collapsed,
       kubeLogo,
@@ -200,16 +219,34 @@ export default ({
 </script>
 
 <style>
-  .ant-layout-header {
+    .ant-layout-header {
       padding: 0 30px !important;
-  }
-
-  .ant-layout-footer {
-    padding: 5px 50px !important;
-    color: rgb(239, 239, 239);
-  }
-
-  .is-collapse {
-    display: none;
-  }
+    }
+    .ant-layout-content::-webkit-scrollbar {
+      width:6px;
+    }
+    .ant-layout-content::-webkit-scrollbar-track {
+      background-color:rgb(164, 162, 162);
+    }
+    .ant-layout-content::-webkit-scrollbar-thumb {
+      background-color:#666;
+    }
+    .ant-layout-footer {
+      padding: 5px 50px !important;
+      color: rgb(239, 239, 239);
+    }
+    .is-collapse {
+      display: none;
+    }
+    .ant-layout-sider {
+      background: #141414 !important;
+      overflow-y: auto;
+    }
+    /*侧边按滚轴*/
+    .ant-layout-sider::-webkit-scrollbar {
+      display: none;
+    }
+    .ant-menu-item {
+      margin: 0 !important;
+    }
 </style>
